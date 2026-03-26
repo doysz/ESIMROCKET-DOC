@@ -177,46 +177,6 @@
           }
         },
         {
-          "name": "2.6 esim.suspended (ระงับชั่วคราว - SUSPEND)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
-              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"event\": \"esim.suspended\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"SUSPEND\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/partner/webhook",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "partner", "webhook"]
-            }
-          }
-        },
-        {
-          "name": "2.7 esim.unsuspended (ยกเลิกระงับชั่วคราว - IN_USE)",
-          "request": {
-            "method": "POST",
-            "header": [
-              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
-              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
-              { "key": "Content-Type", "value": "application/json", "type": "text" }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"event\": \"esim.unsuspended\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"IN_USE\",\n    \"oldStatus\": \"SUSPEND\",\n    \"newStatus\": \"IN_USE\"\n  }\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/partner/webhook",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "partner", "webhook"]
-            }
-          }
-        },
-        {
           "name": "2.8 esim.revoked (เพิกถอนถาวร - REVOKED)",
           "request": {
             "method": "POST",
