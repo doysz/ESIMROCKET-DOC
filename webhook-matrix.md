@@ -211,7 +211,7 @@
 
 ### 5.1 ทดสอบด้วย Postman Collection (แนะนำ)
 เพื่อความสะดวกในการส่งครบทุกเคส ดาวน์โหลดไฟล์ Postman Collection ได้ที่ Repository นี้:
-👉 `docs/webhook-matrix.postman_collection.json` 
+👉 `/webhook-matrix.postman_collection.json` 
 1. นำเข้า (Import) สู่ Postman ของคุณ
 2. ตั้งค่าตัวแปร (Variables): `baseUrl`, `apiKey`, `apiSecret`
 3. กดยิงทดสอบ (Send) ทีละเคสได้เลย ระบบจะสร้าง Webhook ปลอมที่มี Signature ถูกต้องยิงไปหาเซิร์ฟเวอร์ของคุณ
