@@ -1,0 +1,371 @@
+{
+  "info": {
+    "_postman_id": "c30f4a43-8f92-4a0b-8d19-215f9b4c0920",
+    "name": "eSIMRocket Webhook Integration Tests",
+    "description": "คอลเลกชันนี้ใช้สำหรับจำลองการส่ง Webhook จากระบบ eSIMRocket ไปยัง Endpoint ของคุณ เพื่อทดสอบการรับค่า (Integration) และเช็คความถูกต้องของ Payload แต่ละ Event\n\n**วิธีการใช้งาน:**\n1. เข้าไปที่เมนู **Variables** ของคอลเลกชันนี้\n2. แก้ไขค่า `baseUrl` ให้ชี้ไปยังเซิร์ฟเวอร์ eSIMRocket ของคุณ (เช่น `http://localhost:3000` สำหรับทดสอบในเครื่อง หรือ `https://api.esimrocket.com` สำหรับ Production)\n3. ใส่ค่า `apiKey` และ `apiSecret` ของคุณ\n4. เลือก Request ในโฟลเดอร์ต่างๆ และกด Send เพื่อจำลองการยิง Webhook (ระบบจะสร้าง Webhook ปลอมและยิงออกไปหา Endpoint ที่คุณตั้งค่าไว้ในระบบ)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Order Events",
+      "description": "กลุ่ม Event ที่เกี่ยวกับการสั่งซื้อ",
+      "item": [
+        {
+          "name": "1.1 order.created (สั่งซื้อสำเร็จ)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"order.created\",\n  \"testData\": {\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"status\": \"PENDING\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "1.2 order.completed (จัดสรรโปรไฟล์สำเร็จ)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"order.completed\",\n  \"testData\": {\n    \"orderId\": \"1e857301-b308-42b7-aad7-4adf6f0afbdf\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"orderNo\": \"B26022607000005\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"orderStatus\": \"GOT_RESOURCE\",\n    \"status\": \"COMPLETED\",\n    \"packageCode\": \"PQ2I5PFIT\",\n    \"quantity\": 1,\n    \"iccids\": [\"89852240810732710975\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "1.3 order.failed (สั่งซื้อล้มเหลว)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"order.failed\",\n  \"testData\": {\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"status\": \"FAILED\",\n    \"failReason\": \"Insufficient balance\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. eSIM Lifecycle Events",
+      "description": "กลุ่ม Event สถานะของ eSIM (Source of Truth สำหรับ UI)",
+      "item": [
+        {
+          "name": "2.1 esim.activated (ดาวน์โหลดแล้ว รอเริ่มใช้งาน - GOT_RESOURCE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.activated\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"packageCode\": \"PQ2I5PFIT\",\n    \"packageName\": \"Thailand 100MB 7Days\",\n    \"esimStatus\": \"GOT_RESOURCE\",\n    \"smdpStatus\": \"RELEASED\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 0,\n    \"remain\": 5473566720\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.2 esim.activated (เริ่มใช้งานเน็ตแล้ว - IN_USE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.activated\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"IN_USE\",\n    \"smdpStatus\": \"ENABLED\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 1048576,\n    \"remain\": 5472518144\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.3 esim.depleted (เน็ตหมดโควต้า - USED_UP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.depleted\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"USED_UP\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 5473566720,\n    \"remain\": 0\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.4 esim.expired (หมดอายุ - USED_EXPIRED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.expired\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"USED_EXPIRED\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 2048576000,\n    \"remain\": 3424990720\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.5 esim.cancelled (ยกเลิกและคืนเงินสำเร็จ - CANCEL)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.cancelled\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"CANCEL\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 0,\n    \"remain\": 5473566720\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.6 esim.suspended (ระงับชั่วคราว - SUSPEND)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.suspended\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"SUSPEND\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.7 esim.unsuspended (ยกเลิกระงับชั่วคราว - IN_USE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.unsuspended\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"IN_USE\",\n    \"oldStatus\": \"SUSPEND\",\n    \"newStatus\": \"IN_USE\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "2.8 esim.revoked (เพิกถอนถาวร - REVOKED)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.revoked\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"esimStatus\": \"REVOKED\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Usage & Warnings",
+      "description": "กลุ่ม Event แจ้งเตือนปริมาณ Data และวันหมดอายุ",
+      "item": [
+        {
+          "name": "3.1 esim.usage.update (อัปเดตปริมาณ Data รายวัน)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.usage.update\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 1073741824,\n    \"remain\": 4399824896,\n    \"remainThreshold\": 0.8\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "3.2 esim.low_data_warning (แจ้งเตือน Data ใกล้หมด)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.low_data_warning\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\",\n    \"totalVolume\": 5473566720,\n    \"orderUsage\": 4378853376,\n    \"remain\": 1094713344,\n    \"remainThreshold\": 0.2\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "3.3 esim.expiry_warning (แจ้งเตือนใกล้หมดอายุ)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"esim.expiry_warning\",\n  \"testData\": {\n    \"iccid\": \"89852240810732710975\",\n    \"orderNumber\": \"ORD-1772089207457-RCB94\",\n    \"partnerReferenceId\": \"ORDER-10004\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Top-up & Catalog",
+      "description": "กลุ่ม Event เติมเงินและอัปเดตแคตตาล็อกสินค้า",
+      "item": [
+        {
+          "name": "4.1 topup.completed (เติมเงินสำเร็จ)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"topup.completed\",\n  \"testData\": {\n    \"orderNumber\": \"TOPUP-TEST-0001\",\n    \"iccid\": \"89852240810734216906\",\n    \"packageCode\": \"TOPUP_JC045\",\n    \"amount\": 1.58,\n    \"partnerReferenceId\": \"TOPUP-TEST-REF-0001\",\n    \"status\": \"COMPLETED\",\n    \"data\": {\n      \"iccid\": \"89852240810734216906\",\n      \"expiredTime\": \"2026-03-20T21:37:45.575Z\",\n      \"totalVolume\": 1178599424,\n      \"totalDuration\": 7,\n      \"orderUsage\": 0,\n      \"topupEsimTranNo\": \"26022617020013\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        },
+        {
+          "name": "4.2 package.catalogue.updated (สินค้าอัปเดตราคา)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "x-api-key", "value": "{{apiKey}}", "type": "text" },
+              { "key": "x-api-secret", "value": "{{apiSecret}}", "type": "text" },
+              { "key": "Content-Type", "value": "application/json", "type": "text" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"package.catalogue.updated\",\n  \"testData\": {\n    \"obj\": {\n      \"changes\": [\n        {\n          \"changeType\": \"UPDATED\",\n          \"packageCode\": \"PQ2I5PFIT\",\n          \"before\": { \"price\": 1000 },\n          \"after\": { \"price\": 1200 }\n        }\n      ]\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/partner/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "partner", "webhook"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "apiKey",
+      "value": "YOUR_API_KEY",
+      "type": "string"
+    },
+    {
+      "key": "apiSecret",
+      "value": "YOUR_API_SECRET",
+      "type": "string"
+    }
+  ]
+}
